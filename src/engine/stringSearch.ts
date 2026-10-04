@@ -1,5 +1,13 @@
 import type { SearchResult } from '../types';
 
+function buildSearchResult(input: Omit<SearchResult, 'positions' | 'matchCount'>): SearchResult {
+  return {
+    ...input,
+    positions: input.matches,
+    matchCount: input.matches.length,
+  };
+}
+
 export function naiveSearch(text: string, pattern: string): SearchResult {
   const t0 = performance.now();
   const matches: number[] = [];
@@ -8,7 +16,7 @@ export function naiveSearch(text: string, pattern: string): SearchResult {
   const n = text.length;
   const m = pattern.length;
 
-  if (m === 0) return { pattern, matches, executionTimeMs: 0, comparisons: 0, timeComplexity: 'O(N*M)', spaceComplexity: 'O(1)' };
+  if (m === 0) return buildSearchResult({ algorithmName: 'Naive Search', pattern, matches, executionTimeMs: 0, comparisons: 0, timeComplexity: 'O(N*M)', spaceComplexity: 'O(1)' });
 
   for (let i = 0; i <= n - m; i++) {
     let j = 0;
@@ -26,14 +34,15 @@ export function naiveSearch(text: string, pattern: string): SearchResult {
 
   const t1 = performance.now();
   
-  return {
+  return buildSearchResult({
+    algorithmName: 'Naive Search',
     pattern,
     matches,
     executionTimeMs: t1 - t0,
     comparisons,
     timeComplexity: 'O(N*M)',
     spaceComplexity: 'O(1)'
-  };
+  });
 }
 
 export function computeLPSArray(pattern: string): number[] {
@@ -67,7 +76,7 @@ export function kmpSearch(text: string, pattern: string): SearchResult {
   const n = text.length;
   const m = pattern.length;
 
-  if (m === 0) return { pattern, matches, executionTimeMs: 0, comparisons: 0, timeComplexity: 'O(N+M)', spaceComplexity: 'O(M)' };
+  if (m === 0) return buildSearchResult({ algorithmName: 'KMP', pattern, matches, executionTimeMs: 0, comparisons: 0, timeComplexity: 'O(N+M)', spaceComplexity: 'O(M)' });
 
   const lps = computeLPSArray(pattern);
 
@@ -94,14 +103,15 @@ export function kmpSearch(text: string, pattern: string): SearchResult {
 
   const t1 = performance.now();
 
-  return {
+  return buildSearchResult({
+    algorithmName: 'KMP',
     pattern,
     matches,
     executionTimeMs: t1 - t0,
     comparisons,
     timeComplexity: 'O(N+M)',
     spaceComplexity: 'O(M)'
-  };
+  });
 }
 
 export function rabinKarpSearch(text: string, pattern: string, q: number = 101): SearchResult {
@@ -113,7 +123,7 @@ export function rabinKarpSearch(text: string, pattern: string, q: number = 101):
   const m = pattern.length;
   const d = 256; 
 
-  if (m === 0) return { pattern, matches, executionTimeMs: 0, comparisons: 0, timeComplexity: 'O(N+M)', spaceComplexity: 'O(1)' };
+  if (m === 0) return buildSearchResult({ algorithmName: 'Rabin-Karp', pattern, matches, executionTimeMs: 0, comparisons: 0, timeComplexity: 'O(N+M)', spaceComplexity: 'O(1)' });
 
   let i, j;
   let p = 0;
@@ -151,14 +161,15 @@ export function rabinKarpSearch(text: string, pattern: string, q: number = 101):
 
   const t1 = performance.now();
 
-  return {
+  return buildSearchResult({
+    algorithmName: 'Rabin-Karp',
     pattern,
     matches,
     executionTimeMs: t1 - t0,
     comparisons,
     timeComplexity: 'O(N+M) avg, O(N*M) worst',
     spaceComplexity: 'O(1)'
-  };
+  });
 }
 
 export function computeZArray(str: string): number[] {
@@ -196,7 +207,7 @@ export function zAlgorithmSearch(text: string, pattern: string): SearchResult {
   let comparisons = 0; // Difficult to accurately track inside the Z array construction linearly without modifying computeZArray, estimating or tracking in a custom one.
   
   const m = pattern.length;
-  if (m === 0) return { pattern, matches, executionTimeMs: 0, comparisons: 0, timeComplexity: 'O(N+M)', spaceComplexity: 'O(N+M)' };
+  if (m === 0) return buildSearchResult({ algorithmName: 'Z Algorithm', pattern, matches, executionTimeMs: 0, comparisons: 0, timeComplexity: 'O(N+M)', spaceComplexity: 'O(N+M)' });
 
   const concat = pattern + "$" + text;
   const l = concat.length;
@@ -242,12 +253,13 @@ export function zAlgorithmSearch(text: string, pattern: string): SearchResult {
 
   const t1 = performance.now();
 
-  return {
+  return buildSearchResult({
+    algorithmName: 'Z Algorithm',
     pattern,
     matches,
     executionTimeMs: t1 - t0,
     comparisons,
     timeComplexity: 'O(N+M)',
     spaceComplexity: 'O(N+M)'
-  };
+  });
 }
